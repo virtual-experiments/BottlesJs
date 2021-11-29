@@ -3,7 +3,7 @@ function loadImage(url) {
     imgElement.src = url;
     imgElement.style.display = 'none';
     document.body.appendChild(imgElement);
-    return new Promise((resolve, reject) => imgElement.onload = () => { resolve(imgElement); });
+    return new Promise<HTMLImageElement>((resolve, reject) => imgElement.onload = () => { resolve(imgElement); });
 }
 const waterTankLeft = 26;
 const tanksY = 59;
@@ -25,7 +25,7 @@ const thermometerBottom = 103;
 const thermometerSpeed = 5000; // In milliseconds per pixel.
 
 (async () => {
-    const bottlesCanvas = document.getElementById('bottlesCanvas');
+    const bottlesCanvas = document.getElementById('bottlesCanvas') as HTMLCanvasElement;
     const backgroundImage = await loadImage('background.gif');
     const emptyBottleImage = await loadImage('emptybottle.gif');
     const filledBottleImage = await loadImage('filledbottle.gif');
