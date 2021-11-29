@@ -6,10 +6,10 @@ function loadImage(url) {
     return new Promise<HTMLImageElement>((resolve, reject) => imgElement.onload = () => { resolve(imgElement); });
 }
 const waterTankLeft = 26;
-const tanksY = 59;
-const waterTankRight = 35;
-const tanksHeight = 76;
-const co2TankLeft = 192;
+const tanksY = 55;
+const waterTankRight = 38;
+const tanksHeight = 133-55;
+const co2TankLeft = 190;
 const co2TankRight = 203;
 const bottleY = 193;
 const bottleXEntry = 34;
@@ -18,10 +18,10 @@ const bottleXExit = 516;
 const bottlesDistance = 60;
 const bottleSpeed = 10; // In milliseconds per pixel.
 const tanksSpeed = 1000; // In milliseconds per pixel.
-const thermometerLeft = 381;
+const thermometerLeft = 375.5;
 const thermometerTop = 16;
-const thermometerRight = 386;
-const thermometerBottom = 103;
+const thermometerRight = 383.25;
+const thermometerBottom = 91;
 const thermometerSpeed = 5000; // In milliseconds per pixel.
 
 (async () => {
@@ -43,5 +43,15 @@ const thermometerSpeed = 5000; // In milliseconds per pixel.
             ctxt.drawImage(image, x, bottleY);
             x += bottlesDistance;
         }
+        ctxt.fillStyle = 'blue';
+        const tanksLevel = dt / tanksSpeed % (tanksHeight + 1);
+        ctxt.fillRect(waterTankLeft, tanksY + tanksLevel, waterTankRight - waterTankLeft, tanksHeight - tanksLevel);
+        ctxt.fillStyle = 'gray';
+        ctxt.fillRect(co2TankLeft, tanksY + tanksLevel, co2TankRight - co2TankLeft, tanksHeight - tanksLevel);
+        ctxt.fillStyle = '#da251d';
+        const thermLevel = Math.max(thermometerTop,
+            thermometerBottom - 50 - dt / thermometerSpeed);
+        ctxt.fillRect(thermometerLeft, thermLevel,
+            thermometerRight - thermometerLeft, thermometerBottom - thermLevel);
     }
 })();
