@@ -4,12 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "npx tsc && open dist/bottles.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run": "npx tsc && npx webpack && open dist/bottles.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm js/* dist/bundle.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1"
   }
 }

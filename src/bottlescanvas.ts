@@ -24,8 +24,10 @@ const thermometerRight = 383.25;
 const thermometerBottom = 91;
 const thermometerSpeed = 5000; // In milliseconds per pixel.
 
-(async () => {
-    const bottlesCanvas = document.getElementById('bottlesCanvas') as HTMLCanvasElement;
+export default async function createBottlesCanvas() {
+    const bottlesCanvas = document.createElement('canvas');
+    bottlesCanvas.width = 593;
+    bottlesCanvas.height = 300;
     const backgroundImage = await loadImage('background.gif');
     const emptyBottleImage = await loadImage('emptybottle.gif');
     const filledBottleImage = await loadImage('filledbottle.gif');
@@ -54,4 +56,5 @@ const thermometerSpeed = 5000; // In milliseconds per pixel.
         ctxt.fillRect(thermometerLeft, thermLevel,
             thermometerRight - thermometerLeft, thermometerBottom - thermLevel);
     }
-})();
+    return bottlesCanvas;
+}

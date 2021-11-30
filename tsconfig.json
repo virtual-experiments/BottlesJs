@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "dist",
+        "outDir": "js",
         "lib": ["ESNext", "DOM"]
     },
     "include": ["src/*.ts"]

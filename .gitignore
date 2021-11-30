@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
-dist/bottles.js
+dist/bundle.js
+js
