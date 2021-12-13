@@ -1,10 +1,6 @@
-function loadImage(url) {
-    let imgElement = document.createElement('img');
-    imgElement.src = url;
-    imgElement.style.display = 'none';
-    document.body.appendChild(imgElement);
-    return new Promise<HTMLImageElement>((resolve, reject) => imgElement.onload = () => { resolve(imgElement); });
-}
+import { BottleImage } from './bottleimage';
+import { loadImage } from './util';
+
 const waterTankLeft = 26;
 const tanksY = 55;
 const waterTankRight = 38;
@@ -24,7 +20,19 @@ const thermometerRight = 383.25;
 const thermometerBottom = 91;
 const thermometerSpeed = 5000; // In milliseconds per pixel.
 
-export default async function createBottlesCanvas() {
+function getTemperature(t: number): number {
+    return Math.min(t / 15 / thermometerSpeed, 1);
+}
+
+function getTanksLevel(t: number): number {
+    return t / tanksSpeed % (tanksHeight + 1) / (tanksHeight + 1);
+}
+
+export interface BottleCanvasListener {
+    bottleClicked(tanksLevel: number, temperature: number): void;
+}
+
+export default async function createBottlesCanvas(listener: BottleCanvasListener) {
     const bottlesCanvas = document.createElement('canvas');
     bottlesCanvas.width = 593;
     bottlesCanvas.height = 300;
@@ -33,6 +41,31 @@ export default async function createBottlesCanvas() {
     const filledBottleImage = await loadImage('filledbottle.gif');
     const ctxt = bottlesCanvas.getContext('2d');
     const startTimeMillis = Date.now();
+    bottlesCanvas.onclick = (e) => {
+        let x = e.x;
+        const y = e.y;
+        const millis = Date.now();
+        const dt = millis - startTimeMillis;
+        const firstBottleX = bottleXEntry + dt / bottleSpeed;
+        const startX = bottleXEntry + dt / bottleSpeed % bottlesDistance;
+
+        if (bottleY <= y && y <= bottleY + BottleImage.height &&
+            bottleXFilled <= x && x <= Math.min(bottleXExit, firstBottleX) + BottleImage.width) {
+            x -= startX;
+            const bottleNumber = x / bottlesDistance;
+            if (x % bottlesDistance < BottleImage.width) {
+                if (listener != null) {
+                    const clickedBottleX = startX + bottleNumber * bottlesDistance;
+                    const distanceTravelled = clickedBottleX - bottleXFilled;
+                    const bottleFilledTime = dt - distanceTravelled * bottleSpeed;
+                    listener.bottleClicked(
+                        getTanksLevel(bottleFilledTime),
+                        getTemperature(bottleFilledTime)
+                    );
+                }
+            }
+        }
+    };
     setInterval(paint, 100);
     function paint() {
         ctxt.drawImage(backgroundImage, 0, 0);
