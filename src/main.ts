@@ -23,6 +23,7 @@ function getPH(tanksLevel: number, temperature: number): string {
     let sampling = false;
     const counterLabel = h('span', {}, ['Number of bottles in current sample: 0']);
     const resultsTextArea = h('textarea', {'style': 'width: 100%; padding: 0; box-sizing: border-box', 'rows': 10, 'readonly': true}, []) as HTMLTextAreaElement;
+    const historyTextArea = h('textarea', {'style': 'width: 100%; padding: 0; box-sizing: border-box; display: none', 'rows': 50, 'readonly': true}, []) as HTMLTextAreaElement;
     function updateCounterLabel() {
         counterLabel.innerText = 'Number of bottles in current sample: ' + bottlesCount;
         bottleBoxesCanvas.setBottlesCount(bottlesCount);
@@ -53,6 +54,7 @@ function getPH(tanksLevel: number, temperature: number): string {
     const analyzeButton = h('button', {'style': 'width: 100%; height: 100%'}, [h('span', {}, ['Analyze'])]) as HTMLButtonElement;
     analyzeButton.onclick = () => {
         history += analysis + '\n';
+        historyTextArea.value = history;
         resultsTextArea.value = analysis;
         analyzeButton.disabled = true;
         sampling = false;
@@ -71,6 +73,12 @@ function getPH(tanksLevel: number, temperature: number): string {
         ])
     ]);
     const historyButton = h('button', {}, ['History']);
+    historyButton.onclick = () => {
+        if (historyTextArea.style.display === 'none')
+            historyTextArea.style.display = 'inline';
+        else
+            historyTextArea.style.display = 'none';
+    };
     const newSampleButton = h('button', {}, ['New Sample']);
     newSampleButton.onclick = () => {
         startNewAnalysis();
@@ -84,6 +92,7 @@ function getPH(tanksLevel: number, temperature: number): string {
     document.body.appendChild(h('table', {}, [
         h('tr', {}, [h('td', {}, [topPanel])]),
         h('tr', {}, [h('td', {}, [resultsTextArea])]),
-        h('tr', {}, [h('td', {}, [buttonsPanel])])
+        h('tr', {}, [h('td', {}, [buttonsPanel])]),
+        h('tr', {}, [h('td', {}, [historyTextArea])])
     ]));
 })();

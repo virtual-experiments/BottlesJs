@@ -10,6 +10,7 @@ export default class BottleBoxesCanvas {
 
     constructor() {
         this.element = document.createElement('canvas');
+        this.element.style.backgroundColor = 'white';
         this.element.width = (BottleImage.width + 2 * padding) * 15;
         this.element.height = BottleImage.height + 2 * padding;
         this.bottlesCount = 0;
