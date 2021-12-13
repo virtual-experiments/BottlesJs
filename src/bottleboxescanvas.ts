@@ -1,5 +1,5 @@
-import { TypeOfTag } from 'typescript';
 import { BottleImage } from './bottleimage';
+import { h } from './util';
 
 const padding = 2;
 
@@ -9,8 +9,7 @@ export default class BottleBoxesCanvas {
     bottlesCount: number;
 
     constructor() {
-        this.element = document.createElement('canvas');
-        this.element.style.backgroundColor = 'white';
+        this.element = h('canvas', {style: 'background-color: white'});
         this.element.width = (BottleImage.width + 2 * padding) * 15;
         this.element.height = BottleImage.height + 2 * padding;
         this.bottlesCount = 0;
