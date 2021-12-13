@@ -2,26 +2,84 @@ import createBottlesCanvas from './bottlescanvas';
 import BottleBoxesCanvas from './bottleboxescanvas';
 import { h } from './util';
 
+function justifyLeft(width: number, text: string): string {
+    return text + ' '.repeat(Math.max(0, width - text.length));
+}
+
+function justifyRight(width: number, text: string): string {
+    return ' '.repeat(Math.max(0, width - text.length)) + text;
+}
+
+function getPH(tanksLevel: number, temperature: number): string {
+    const ph = (6.75 + Math.pow(tanksLevel - 0.5, 3)) * (20.0 + temperature) / 20.0;
+    return justifyRight(5, ph.toFixed(2));
+}
+
 (async () => {
+    let history = "";
     let bottlesCount = 0;
+    let analysis = "";
+    let sampleNumber = 0;
+    let sampling = false;
+    const counterLabel = h('span', {}, ['Number of bottles in current sample: 0']);
+    const resultsTextArea = h('textarea', {'style': 'width: 100%', 'rows': 10, 'readonly': true}, []) as HTMLTextAreaElement;
+    function updateCounterLabel() {
+        counterLabel.innerText = 'Number of bottles in current sample: ' + bottlesCount;
+        bottleBoxesCanvas.setBottlesCount(bottlesCount);
+    }
+    function startNewAnalysis() {
+        bottlesCount = 0;
+        updateCounterLabel();
+        sampling = true;
+        ++sampleNumber;
+        resultsTextArea.value = '';
+        analysis = 'Analysis of sample number ' + sampleNumber + '\n';
+        analysis += 'Bottle   pH\n';
+    }
     const bottlesCanvas = await createBottlesCanvas({
         bottleClicked(tanksLevel, temperature) {
-            bottleBoxesCanvas.setBottlesCount(++bottlesCount);
+            if (sampling) {
+                ++bottlesCount;
+                analysis += justifyLeft(9, bottlesCount.toString());
+                analysis += getPH(tanksLevel, temperature);
+                analysis += '\n';
+                updateCounterLabel();
+            }
         }
     });
     const bottleBoxesCanvas = new BottleBoxesCanvas();
-    const analyzeButton = h('button', {'style': 'width: 100%; height: 100%'}, [h('span', {}, ['Analyze'])]);
-    document.body.appendChild(h('table', {}, [
+    startNewAnalysis();
+    const analyzeButton = h('button', {'style': 'width: 100%; height: 100%'}, [h('span', {}, ['Analyze'])]) as HTMLButtonElement;
+    analyzeButton.onclick = () => {
+        history += analysis + '\n';
+        resultsTextArea.value = analysis;
+        analyzeButton.disabled = true;
+        sampling = false;
+    };
+    const counterPanel = h('table', {}, [
+        h('tr', {}, [h('td', {'colspan': 2}, [counterLabel])]),
+        h('tr', {}, [
+            h('td', {}, [bottleBoxesCanvas.element]),
+            h('td', {'style': 'height: 100%'}, [analyzeButton])
+        ])
+    ]);
+    const topPanel = h('table', {}, [
         h('tr', {}, [h('td', {}, [bottlesCanvas])]),
         h('tr', {}, [
-            h('td', {}, [
-                h('table', {}, [
-                    h('tr', {}, [
-                        h('td', {}, [bottleBoxesCanvas.element]),
-                        h('td', {'style': 'height: 100%'}, [analyzeButton])
-                    ])
-                ])
-            ])
+            h('td', {}, [counterPanel])
         ])
+    ]);
+    const historyButton = h('button', {}, ['History']);
+    const newSampleButton = h('button', {}, ['New Sample']);
+    const buttonsPanel = h('table', {}, [
+        h('tr', {}, [
+            h('td', {}, [historyButton]),
+            h('td', {}, [newSampleButton])
+        ])
+    ]);
+    document.body.appendChild(h('table', {}, [
+        h('tr', {}, [h('td', {}, [topPanel])]),
+        h('tr', {}, [h('td', {}, [resultsTextArea])]),
+        h('tr', {}, [h('td', {}, [buttonsPanel])])
     ]));
 })();
