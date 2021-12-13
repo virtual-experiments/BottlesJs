@@ -22,7 +22,7 @@ function getPH(tanksLevel: number, temperature: number): string {
     let sampleNumber = 0;
     let sampling = false;
     const counterLabel = h('span', {}, ['Number of bottles in current sample: 0']);
-    const resultsTextArea = h('textarea', {'style': 'width: 100%', 'rows': 10, 'readonly': true}, []) as HTMLTextAreaElement;
+    const resultsTextArea = h('textarea', {'style': 'width: 100%; padding: 0; box-sizing: border-box', 'rows': 10, 'readonly': true}, []) as HTMLTextAreaElement;
     function updateCounterLabel() {
         counterLabel.innerText = 'Number of bottles in current sample: ' + bottlesCount;
         bottleBoxesCanvas.setBottlesCount(bottlesCount);
@@ -44,6 +44,7 @@ function getPH(tanksLevel: number, temperature: number): string {
                 analysis += getPH(tanksLevel, temperature);
                 analysis += '\n';
                 updateCounterLabel();
+                analyzeButton.disabled = false;
             }
         }
     });
@@ -64,17 +65,20 @@ function getPH(tanksLevel: number, temperature: number): string {
         ])
     ]);
     const topPanel = h('table', {}, [
-        h('tr', {}, [h('td', {}, [bottlesCanvas])]),
+        h('tr', {}, [h('td', {'align': 'center'}, [bottlesCanvas])]),
         h('tr', {}, [
             h('td', {}, [counterPanel])
         ])
     ]);
     const historyButton = h('button', {}, ['History']);
     const newSampleButton = h('button', {}, ['New Sample']);
-    const buttonsPanel = h('table', {}, [
+    newSampleButton.onclick = () => {
+        startNewAnalysis();
+    };
+    const buttonsPanel = h('table', {'width': '100%'}, [
         h('tr', {}, [
-            h('td', {}, [historyButton]),
-            h('td', {}, [newSampleButton])
+            h('td', {'width': '50%', 'align': 'center'}, [historyButton]),
+            h('td', {'width': '50%', 'align': 'center'}, [newSampleButton])
         ])
     ]);
     document.body.appendChild(h('table', {}, [
