@@ -1,0 +1,37 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 16
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+
+    - name: Build
+      run: |
+        set +x +e
+        npm install
+        npm run build
+        cd dist
+        git init
+        git config --global user.name "$GITHUB_REPOSITORY GitHub Actions runner"
+        git config --global user.email "no@email"
+        git add .
+        git commit -m "Built from $GITHUB_SHA"
+        git remote add origin $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+        git checkout -b gh-pages
+        gh auth setup-git
+        git push -f origin gh-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
